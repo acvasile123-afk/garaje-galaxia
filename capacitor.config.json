@@ -1,0 +1,9 @@
+{
+  "appId": "com.tuestudio.garajegalaxia",
+  "appName": "Del Garaje a la Galaxia",
+  "webDir": "www",
+  "backgroundColor": "#07080f",
+  "server": {
+    "androidScheme": "https"
+  }
+}

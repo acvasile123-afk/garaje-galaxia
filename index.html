@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07080f">
+<title>Del Garaje a la Galaxia</title>
+<style>
+:root{
+  --bg:#07080f; --panel:#10122a; --panel2:#171a3a; --line:#262b5c;
+  --cyan:#22e6ff; --mag:#ff3df2; --lime:#7dff6a; --amber:#ffc43d; --red:#ff4d6d;
+  --txt:#e8ecff; --mut:#8a91c7;
+  --sat:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px));
+  --sab:max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+body{display:flex;justify-content:center}
+button{font-family:inherit;cursor:pointer}
+#app{width:100%;max-width:520px;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;
+  background:
+   radial-gradient(900px 420px at 50% -10%, rgba(255,61,242,.14), transparent 60%),
+   radial-gradient(700px 420px at 100% 45%, rgba(34,230,255,.10), transparent 60%),
+   var(--bg)}
+#hdr{padding:calc(8px + var(--sat)) 14px 8px;border-bottom:1px solid var(--line);
+  background:rgba(7,8,15,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5}
+.topline{display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:800;font-size:11px;letter-spacing:.18em;color:var(--mut)}
+.icon-btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:10px;width:34px;height:34px;font-size:16px}
+.money{font-size:clamp(30px,9vw,44px);font-weight:900;text-align:center;color:#fff;line-height:1.1;margin-top:2px;
+  text-shadow:0 0 18px rgba(34,230,255,.7);font-variant-numeric:tabular-nums;word-break:break-all}
+.sub{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.sub b{color:var(--cyan)}
+#chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px;min-height:26px}
+.chip{font-size:11px;font-weight:700;padding:4px 8px;border-radius:99px;border:1px solid var(--line);background:var(--panel);white-space:nowrap}
+.chip.boom{border-color:var(--lime);color:var(--lime);box-shadow:0 0 10px rgba(125,255,106,.25)}
+.chip.crisis{border-color:var(--red);color:var(--red);box-shadow:0 0 10px rgba(255,77,109,.25)}
+.chip.idle{color:var(--mut)}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 18px}
+.tab{display:none}.tab.on{display:block}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:16px 2px 8px}
+h3{margin:0 0 8px;font-size:18px}
+.small{font-size:12px;color:var(--mut);line-height:1.4}
+.muted{opacity:.8}
+.warn{color:var(--amber)}
+.row2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+
+/* Botón principal */
+#clickZone{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 10px}
+#flowWrap{position:relative;width:100%;height:22px;border-radius:99px;background:#0b0d22;border:1px solid var(--line);overflow:hidden}
+#flowBar{height:100%;width:0;background:linear-gradient(90deg,var(--mag),var(--cyan));transition:width .1s linear}
+#flowBar.on{background:linear-gradient(90deg,var(--amber),#fff36b);box-shadow:0 0 14px var(--amber)}
+#flowTxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:.1em}
+#codeBtn{width:min(62vw,250px);aspect-ratio:1;border-radius:50%;border:2px solid var(--cyan);color:#fff;
+  background:radial-gradient(circle at 35% 30%,#2a3cff 0%,#1a1c5a 45%,#0c0d26 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  box-shadow:0 0 30px rgba(34,230,255,.5),inset 0 0 30px rgba(34,230,255,.25);
+  touch-action:manipulation;transition:transform .06s;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#codeBtn.press{transform:scale(.94)}
+#codeBtn .ico{font:800 clamp(34px,11vw,54px) ui-monospace,Menlo,Consolas,monospace;color:var(--cyan);text-shadow:0 0 14px var(--cyan)}
+#codeBtn .lbl{font-weight:800;font-size:15px}
+#clickVal{font-size:14px;color:var(--lime);font-weight:800;text-shadow:0 0 8px rgba(125,255,106,.6)}
+#floats{position:absolute;inset:0;pointer-events:none;z-index:3}
+.float{position:absolute;font-weight:900;font-size:18px;color:var(--lime);white-space:nowrap;
+  text-shadow:0 0 8px rgba(125,255,106,.8);animation:floatUp .9s ease-out forwards}
+.float.big{color:var(--amber);font-size:24px;text-shadow:0 0 10px rgba(255,196,61,.9)}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,0) scale(.8)}100%{opacity:0;transform:translate(-50%,-90px) scale(1.15)}}
+#bug{position:absolute;font-size:34px;background:none;border:0;padding:10px;z-index:4;
+  filter:drop-shadow(0 0 8px var(--red));animation:wig .5s infinite alternate;touch-action:manipulation}
+@keyframes wig{from{transform:rotate(-12deg) scale(1)}to{transform:rotate(12deg) scale(1.15)}}
+
+/* Tarjetas */
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.card.can{border-color:rgba(34,230,255,.55);box-shadow:0 0 14px rgba(34,230,255,.12)}
+.card.owned{opacity:.55}
+.card.lock{opacity:.5;filter:grayscale(.6)}
+.card.glow{border-color:rgba(255,61,242,.5);box-shadow:0 0 16px rgba(255,61,242,.15)}
+.card.warnbox{border-color:var(--amber);color:var(--amber);font-size:13px}
+.card.ev.boom{border-color:rgba(125,255,106,.6)}
+.card.ev.crisis{border-color:rgba(255,77,109,.6)}
+.up{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.up-n{font-weight:800;font-size:14px}
+.up-d{font-size:12px;color:var(--mut)}
+.up .btn{min-width:96px}
+.btn{border:1px solid var(--cyan);background:rgba(34,230,255,.12);color:var(--cyan);font-weight:800;border-radius:10px;
+  padding:8px 12px;font-size:13px;min-height:42px;touch-action:manipulation}
+.btn:disabled{opacity:.4;border-color:var(--line);color:var(--mut);background:transparent;cursor:default}
+.btn.mag{border-color:var(--mag);color:var(--mag);background:rgba(255,61,242,.12)}
+.btn.gold{border-color:var(--amber);color:var(--amber);background:rgba(255,196,61,.12)}
+.btn.red{border-color:var(--red);color:var(--red);background:rgba(255,77,109,.12)}
+.card>.btn,.sheet .btn{width:100%;margin-top:8px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;margin-bottom:10px}
+.seg button{flex:1;background:none;border:0;color:var(--mut);font-weight:800;padding:10px 0;border-radius:9px;font-size:14px;touch-action:manipulation}
+.seg button.on{background:rgba(255,61,242,.18);color:#fff;box-shadow:inset 0 0 10px rgba(255,61,242,.35)}
+.bar{height:8px;background:#0b0d22;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--mag));transition:width .15s linear}
+.bar.hype>i{background:linear-gradient(90deg,var(--lime),var(--amber),var(--red))}
+.card.ev .bar>i{background:linear-gradient(90deg,var(--cyan),var(--mag))}
+
+/* Startups */
+.biz-top{display:flex;gap:10px;align-items:center}
+.bz-ico{font-size:28px}
+.bz-meta{flex:1;min-width:0}
+.bz-name{font-weight:800;font-size:15px}
+.bz-desc{font-size:12px;color:var(--mut)}
+.bz-n{font-weight:900;font-size:20px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.bz-mid{margin:8px 0 6px}
+.bz-foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bz-inc{font-size:13px;font-weight:700;color:var(--lime)}
+.buy{display:flex;flex-direction:column;align-items:center;line-height:1.15;min-width:104px}
+.buy .k{font-size:12px}.buy .c{font-size:13px}
+.tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 6px;border-radius:99px;border:1px solid var(--line);color:var(--mut);margin-left:6px;vertical-align:middle}
+.tag.boom{color:var(--lime);border-color:var(--lime)}.tag.crisis{color:var(--red);border-color:var(--red)}
+
+/* Mercado */
+.srow{display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.srow:last-child{border-bottom:0}
+.srow>span:first-child{flex:1;min-width:90px;font-weight:700}
+.sh{color:var(--mut);width:40px;text-align:right}
+.sm{width:62px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.sm.up{color:var(--lime)}.sm.down{color:var(--red)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.grid3 b{display:block;font-size:18px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.sel{width:100%;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px;margin-bottom:8px}
+.dil{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dil .btn{width:auto;margin:0;min-width:130px}
+.of-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:6px}
+.of-b{font-size:13px;margin-bottom:4px}
+.of-p{font-size:13px;margin-top:6px;color:var(--cyan)}
+
+.hbtns{display:flex;gap:6px}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.badge{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;opacity:.6;filter:grayscale(.8)}
+.badge.got{opacity:1;filter:none;border-color:var(--amber);box-shadow:0 0 14px rgba(255,196,61,.25)}
+.b-ico{font-size:30px}
+.b-n{font-weight:800;font-size:13px;margin-top:2px}
+.b-d{font-size:11px;color:var(--mut);min-height:28px;margin:2px 0 6px;line-height:1.3}
+.b-p{font-size:11px;color:var(--mut);margin-top:4px;font-weight:700}
+.badge.got .b-p{color:var(--amber)}
+.bigmoney{font-size:32px;font-weight:900;color:var(--amber);text-align:center;margin:8px 0 4px;text-shadow:0 0 14px rgba(255,196,61,.6);word-break:break-all}
+/* Navegación */
+nav{display:flex;border-top:1px solid var(--line);background:rgba(7,8,15,.96);padding-bottom:var(--sab)}
+nav button{flex:1;background:none;border:0;color:var(--mut);padding:9px 0 8px;font-size:11px;font-weight:700;
+  display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;touch-action:manipulation}
+nav button .e{font-size:20px}
+nav button.on{color:var(--cyan);text-shadow:0 0 10px rgba(34,230,255,.7)}
+.dot{position:absolute;top:6px;right:calc(50% - 22px);width:9px;height:9px;border-radius:50%;background:var(--mag);box-shadow:0 0 8px var(--mag);animation:pulse 1s infinite alternate}
+@keyframes pulse{from{transform:scale(.8)}to{transform:scale(1.25)}}
+
+/* Toasts y modal */
+#toasts{position:absolute;left:10px;right:10px;bottom:calc(70px + var(--sab));z-index:30;pointer-events:none;
+  display:flex;flex-direction:column;gap:6px;align-items:center}
+.toast{background:rgba(16,18,42,.96);border:1px solid var(--cyan);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;
+  box-shadow:0 0 14px rgba(34,230,255,.25);max-width:100%;animation:tin .2s ease-out;transition:opacity .4s}
+.toast.out{opacity:0}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#modal{position:absolute;inset:0;background:rgba(3,4,10,.78);display:flex;align-items:flex-end;z-index:20}
+.sheet{width:100%;max-height:90%;overflow-y:auto;background:var(--panel);border-top:1px solid var(--mag);border-radius:20px 20px 0 0;
+  padding:16px 14px calc(16px + var(--sab));box-shadow:0 -10px 40px rgba(255,61,242,.2)}
+.sheet p{margin:0 0 10px;line-height:1.45;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* --- Anti-zoom y anti-selección --- */
+html,body,#app,main{touch-action:pan-x pan-y}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body,#app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+svg,img{-webkit-user-drag:none;pointer-events:none}
+/* --- Barras animadas --- */
+.bar>i{position:relative;overflow:hidden}
+.bar>i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.38) 50%,transparent 80%);transform:translateX(-100%);animation:shine 1.8s ease-in-out infinite}
+@keyframes shine{to{transform:translateX(100%)}}
+/* --- Iconos SVG de startups --- */
+.bz-ico{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:13px;color:var(--mut);
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.10),rgba(255,255,255,.02));border:1px solid var(--line)}
+.bz-ico svg{width:32px;height:32px}
+.bz-ico.live svg{filter:drop-shadow(0 0 5px currentColor);animation:icoPulse 2.2s ease-in-out infinite}
+@keyframes icoPulse{50%{transform:scale(1.1) rotate(-3deg)}}
+/* --- IPO --- */
+.btn.big{min-height:50px;font-size:15px}
+.ipo-hero{text-align:center}
+.ipo-hero svg{width:72px;height:72px;color:var(--amber);filter:drop-shadow(0 0 10px rgba(255,196,61,.6))}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hdr">
+    <div class="topline">
+      <div class="brand">DEL GARAJE A LA GALAXIA</div>
+      <div class="hbtns"><button class="icon-btn" id="btnMute" aria-label="Silenciar sonido">🔊</button><button class="icon-btn" id="btnCfg" aria-label="Ajustes">⚙️</button></div>
+    </div>
+    <div class="money" id="money">$0</div>
+    <div class="sub">
+      <span><b id="ips">$0</b>/s</span>
+      <span id="val">Valoración $0</span>
+      <span id="inv">Inversores ×1.00</span>
+      <span id="achH">Logros ×1.00</span>
+      <span id="fsH">Fundador ×1.00</span>
+    </div>
+    <div id="chips"></div>
+  </header>
+
+  <main id="main">
+    <!-- CÓDIGO -->
+    <section class="tab on" id="tab-code">
+      <div id="clickZone">
+        <div id="flowWrap"><div id="flowBar"></div><div id="flowTxt">FLOW 0%</div></div>
+        <button id="codeBtn" aria-label="Desarrollar / Programar">
+          <span class="ico">&lt;/&gt;</span>
+          <span class="lbl">Desarrollar / Programar</span>
+          <span id="clickVal">+$1</span>
+        </button>
+        <button id="bug" hidden aria-label="Bug crítico">🐞</button>
+        <div id="floats"></div>
+        <div class="small" style="text-align:center">Cada toque llena Flow. Al 100%: clic ×3 durante 6 s. Toca los 🐞 antes de que huyan.</div>
+      </div>
+      <h2>Mejoras de clic</h2>
+      <div id="clickUps"></div>
+    </section>
+
+    <!-- STARTUPS -->
+    <section class="tab" id="tab-biz">
+      <div class="seg" id="buyMode">
+        <button data-m="1" class="on">×1</button>
+        <button data-m="10">×10</button>
+        <button data-m="max">Máx</button>
+      </div>
+      <div id="bizList"></div>
+    </section>
+
+    <!-- MERCADO -->
+    <section class="tab" id="tab-mkt">
+      <div class="seg" id="subSeg">
+        <button data-s="ev" class="on">📈 Eventos</button>
+        <button data-s="rd">💼 Rondas</button>
+      </div>
+
+      <div id="sub-ev">
+        <div class="card">
+          <div class="row2"><b>🔥 Hype</b><span id="hypeVal">0</span></div>
+          <div class="bar hype"><i id="hypeBar"></i></div>
+          <div class="small" style="margin-top:6px">Sube con tus clics y más rápido durante un boom. Con un boom activo, la burbuja puede estallar: p = 0,4 % · (Hype/100)² por segundo.</div>
+          <button class="btn gold" id="btnSell" disabled>💰 Vender en el pico</button>
+        </div>
+        <div class="card"><div class="small" id="radar"></div></div>
+        <h2>Eventos activos</h2>
+        <div id="evList"></div>
+        <h2>Sectores</h2>
+        <div class="card">
+          <div id="secTable"></div>
+          <div class="small" id="divInfo" style="margin-top:8px"></div>
+          <div class="small" id="runInfo"></div>
+        </div>
+        <h2>Pivote</h2>
+        <div class="card">
+          <div class="small" style="margin-bottom:8px">Cambia un negocio de sector por 30 de Hype para reposicionarte antes de un evento.</div>
+          <select class="sel" id="pvBiz" aria-label="Negocio"></select>
+          <select class="sel" id="pvSec" aria-label="Sector destino"></select>
+          <div class="small" id="pvInfo"></div>
+          <button class="btn mag" id="pvBtn">Pivotar (−30 Hype)</button>
+        </div>
+      </div>
+
+      <div id="sub-rd" hidden>
+        <div class="card glow">
+          <div class="row2"><b id="rdTitle">Pre-seed</b><span class="small" id="rdReq"></span></div>
+          <div class="bar"><i id="rdBar"></i></div>
+          <button class="btn mag" id="rdBtn" disabled>Valoración insuficiente</button>
+          <div class="small" style="margin-top:8px">Reinicias dinero y startups, conservas las mejoras de código. Ganas P = ⌊10·√(V/Vₖ)⌋ puntos y eliges inversor.</div>
+        </div>
+        <div class="card">
+          <div class="grid3">
+            <div><b id="stP">0</b><span class="small">Puntos</span></div>
+            <div><b id="stM">×1.00</b><span class="small">Mult. inversores</span></div>
+            <div><b id="stC">100%</b><span class="small">Control</span></div>
+          </div>
+        </div>
+        <h2>Dilución y recompra</h2>
+        <div id="dilBox"></div>
+        <div id="clauseBox"></div>
+      </div>
+    </section>
+
+    <!-- LOGROS -->
+    <section class="tab" id="tab-ach">
+      <div class="card glow">
+        <div class="grid3">
+          <div><b id="achCount">0/0</b><span class="small">Insignias</span></div>
+          <div><b id="achMult">×1.00</b><span class="small">Mult. de logros</span></div>
+          <div><b id="achMax">+0%</b><span class="small">Máximo posible</span></div>
+        </div>
+        <div class="small" style="margin-top:8px">Cada insignia da un bonus permanente a todos tus ingresos (incluidos los clics). Se conservan al cerrar rondas de inversión.</div>
+      </div>
+      <div class="agrid" id="achGrid"></div>
+    </section>
+
+    <!-- BOLSA (IPO) -->
+    <section class="tab" id="tab-ipo">
+      <div class="card glow ipo-hero">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 6a3 3 0 0 1 3 3 11 11 0 0 1 8 10.5V28l4 6H9l4-6v-8.5A11 11 0 0 1 21 9a3 3 0 0 1 3-3z"/><path d="M20 38a4 4 0 0 0 8 0"/></svg>
+        <h3>Salida a Bolsa (IPO)</h3>
+        <div class="small">Cuando hayas cerrado las 6 rondas, tu empresa puede cotizar en bolsa. Reinicias casi todo a cambio de <b>Acciones de Fundador</b>: +10% permanente a clics e ingresos por cada acción.</div>
+      </div>
+      <div class="card">
+        <div class="grid3">
+          <div><b id="fsN">0</b><span class="small">Acciones</span></div>
+          <div><b id="fsM">×1.00</b><span class="small">Bonus permanente</span></div>
+          <div><b id="fsI">0</b><span class="small">IPOs hechas</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row2"><b>Requisito</b><span class="small" id="ipoReq"></span></div>
+        <div class="bar"><i id="ipoBar"></i></div>
+        <div class="small" style="margin-top:8px" id="ipoPrev"></div>
+        <button class="btn gold big" id="ipoBtn" disabled>🔒 IPO bloqueada</button>
+      </div>
+      <div class="small">Se reinicia: dinero, startups, mejoras de clic, rondas, inversores y diluciones. Se conserva: logros y Acciones de Fundador.</div>
+    </section>
+  </main>
+
+  <nav>
+    <button data-tab="code" class="on"><span class="e">💻</span>Código</button>
+    <button data-tab="biz"><span class="e">🏢</span>Startups</button>
+    <button data-tab="mkt"><span class="e">📈</span>Mercado<i class="dot" id="dotMkt" hidden></i></button>
+    <button data-tab="ach"><span class="e">🏅</span>Logros<i class="dot" id="dotAch" hidden></i></button>
+    <button data-tab="ipo"><span class="e">🔔</span>Bolsa<i class="dot" id="dotIpo" hidden></i></button>
+  </nav>
+
+  <div id="toasts"></div>
+  <div id="modal" hidden><div class="sheet" id="modalBody"></div></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= Utilidades ================= */
+const SAVE_KEY = 'garajeGalaxia_v1';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const rand = (a, b) => a + Math.random() * (b - a);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const SUF = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+function trimZeros(s) { return s.indexOf('.') >= 0 ? s.replace(/\.?0+$/, '') : s; }
+function fmt(n) {
+  if (!isFinite(n)) return '∞';
+  if (n < 0) return '-' + fmt(-n);
+  if (n < 1000) {
+    if (n < 10) return trimZeros(n.toFixed(2));
+    if (n < 100) return trimZeros(n.toFixed(1));
+    return String(Math.floor(n));
+  }
+  let e = Math.floor(Math.log10(n) / 3);
+  if (e >= SUF.length) return n.toExponential(2).replace('+', '');
+  let s = (n / Math.pow(1000, e)).toFixed(2);
+  if (parseFloat(s) >= 1000) {
+    e++;
+    if (e >= SUF.length) return n.toExponential(2).replace('+', '');
+    s = (n / Math.pow(1000, e)).toFixed(2);
+  }
+  return s + SUF[e];
+}
+const mon = n => '$' + fmt(n);
+const mmss = s => { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const fmtDur = s => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return h > 0 ? h + ' h ' + m + ' min' : Math.max(1, m) + ' min'; };
+
+/* ================= Datos de diseño ================= */
+const SECTORS = {
+  hardware: { n: 'Hardware', c: '#ffc43d', i: '🔧' },
+  software: { n: 'Software', c: '#22e6ff', i: '💾' },
+  fintech:  { n: 'Fintech',  c: '#7dff6a', i: '💳' },
+  ia:       { n: 'IA',       c: '#ff3df2', i: '🧠' },
+  espacio:  { n: 'Espacio',  c: '#8f7bff', i: '🚀' }
+};
+const SKEYS = Object.keys(SECTORS);
+
+const ico = d => '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+const ICONS = [
+  ico('<rect x="14" y="5" width="20" height="38" rx="4"/><path d="M21 38h6"/><path d="M25 11l-4 7 5 5-3 7" opacity=".7"/>'),
+  ico('<path d="M13 18h22a7 7 0 0 1 6.9 8.2l-1.3 7.6a4 4 0 0 1-6.9 2.1L30 31H18l-4.7 4.9a4 4 0 0 1-6.9-2.1l-1.3-7.6A7 7 0 0 1 13 18z"/><path d="M16 21.5v6M13 24.5h6"/><circle cx="31" cy="23" r="1.6" fill="currentColor"/><circle cx="35.5" cy="26.5" r="1.6" fill="currentColor"/>'),
+  ico('<path d="M14 34a7 7 0 0 1-.6-14A10 10 0 0 1 33 17.5 8.2 8.2 0 0 1 34 34z"/><path d="M24 29v-8M20.5 24.5 24 21l3.5 3.5"/>'),
+  ico('<rect x="5" y="12" width="38" height="25" rx="4"/><path d="M5 20h38M11 30h8"/><circle cx="35" cy="30" r="3" fill="currentColor"/>'),
+  ico('<rect x="10" y="17" width="28" height="22" rx="6"/><path d="M24 17v-6M18 34h12M6 25v7M42 25v7"/><circle cx="24" cy="8.5" r="2.5" fill="currentColor"/><circle cx="18" cy="27" r="2.6" fill="currentColor"/><circle cx="30" cy="27" r="2.6" fill="currentColor"/>'),
+  ico('<rect x="12" y="12" width="24" height="24" rx="5"/><path d="M20 28l4-9 4 9M21.5 25h5"/><path d="M18 5v7M24 5v7M30 5v7M18 36v7M24 36v7M30 36v7M5 18h7M5 24h7M5 30h7M36 18h7M36 24h7M36 30h7"/>'),
+  ico('<g transform="rotate(-45 24 24)"><rect x="19" y="16" width="10" height="16" rx="2"/><rect x="4" y="19" width="11" height="10" rx="1.5"/><rect x="33" y="19" width="11" height="10" rx="1.5"/><path d="M15 24h4M29 24h4M24 16v-4"/></g><path d="M8 38a22 22 0 0 0 14 6" opacity=".5"/>'),
+  ico('<circle cx="24" cy="24" r="11"/><ellipse cx="24" cy="24" rx="21" ry="6.5" transform="rotate(-20 24 24)"/><circle cx="20" cy="21" r="1.8" fill="currentColor" opacity=".6"/><circle cx="28" cy="28" r="1.3" fill="currentColor" opacity=".6"/>')
+];
+
+const BIZ = [
+  { name: 'Garaje Fix',         desc: 'Reparación de móviles',      sector: 'hardware', icon: '📱' },
+  { name: 'Pixelforja',         desc: 'Estudio de apps',            sector: 'software', icon: '🎮' },
+  { name: 'NubeNido',           desc: 'SaaS por suscripción',       sector: 'software', icon: '☁️' },
+  { name: 'Cobrix Pay',         desc: 'Fintech de pagos',           sector: 'fintech',  icon: '💳' },
+  { name: 'Ferrotrón Robotics', desc: 'Robots industriales',        sector: 'hardware', icon: '🤖' },
+  { name: 'Cortexia Labs',      desc: 'Laboratorio de IA',          sector: 'ia',       icon: '🧠' },
+  { name: 'Orbitalia',          desc: 'Constelación de satélites',  sector: 'espacio',  icon: '🛰️' },
+  { name: 'Terranova Colonias', desc: 'Colonias en otros mundos',   sector: 'espacio',  icon: '🪐' }
+].map((b, i) => Object.assign({}, b, { base: 15 * Math.pow(11, i), inc: 0.5 * Math.pow(7.5, i) }));
+
+const UPS = [
+  { n: 'Teclado mecánico',               d: '+1 por clic',               t: 'add', v: 1 },
+  { n: 'Segundo monitor',                d: 'Clic ×2',                   t: 'mul', v: 2 },
+  { n: 'Café de especialidad',           d: '+12 por clic',              t: 'add', v: 12 },
+  { n: 'Stack open source',              d: 'Clic ×2',                   t: 'mul', v: 2 },
+  { n: 'Copilot de IA',                  d: 'Clic ×3',                   t: 'mul', v: 3 },
+  { n: 'Pair programming con un junior', d: '+2.000 por clic',           t: 'add', v: 2000 },
+  { n: 'Clúster de GPUs propio',         d: 'Clic ×3',                   t: 'mul', v: 3 },
+  { n: 'Agente autónomo de código',      d: 'Clic ×5 y 5% de tu IPS por clic', t: 'mul', v: 5, phi: 0.05 }
+].map((u, j) => Object.assign({}, u, { cost: 25 * Math.pow(9, j) }));
+
+const COST_R = 1.15;
+const ROUNDS = ['Pre-seed', 'Seed', 'Serie A', 'Serie B', 'Serie C', 'OPV (salida a bolsa)'];
+const roundName = k => ROUNDS[k - 1] || ('Expansión galáctica ' + (k - ROUNDS.length));
+const roundThreshold = k => 1e5 * Math.pow(50, k - 1);
+
+const BOOMS = [
+  { key: 'ia',       kind: 'boom', icon: '🧠', name: 'Fiebre de la IA',    sectors: ['ia'],       m: 3,   dur: 180 },
+  { key: 'chip',     kind: 'boom', icon: '🔧', name: 'Chip shortage',      sectors: ['hardware'], m: 2,   dur: 240 },
+  { key: 'espacio',  kind: 'boom', icon: '🚀', name: 'Carrera espacial',   sectors: ['espacio'],  m: 3,   dur: 180 },
+  { key: 'neobanco', kind: 'boom', icon: '💳', name: 'Neobancos de moda',  sectors: ['fintech'],  m: 2.5, dur: 180 }
+];
+const CRISES = [
+  { key: 'burbuja',  kind: 'crisis', icon: '💥', name: 'Estallido de burbuja',  sectors: null,                m: 0.3, dur: 120 },
+  { key: 'regula',   kind: 'crisis', icon: '⚖️', name: 'Regulación de datos',   sectors: ['ia', 'software'],  m: 0.5, dur: 240 },
+  { key: 'hack',     kind: 'crisis', icon: '☠️', name: 'Hackeo masivo',         sectors: ['fintech'],         m: 0.4, dur: 180 },
+  { key: 'invierno', kind: 'crisis', icon: '❄️', name: 'Invierno de inversión', sectors: 'all',               m: 0.6, dur: 300 }
+];
+
+/* ================= Estado ================= */
+function freshState() {
+  const boost = {}; SKEYS.forEach(k => boost[k] = 1);
+  return {
+    v: 1, money: 0, biz: new Array(BIZ.length).fill(0), ups: new Array(UPS.length).fill(false),
+    hype: 0, P: 0, rounds: 0, dilutions: [], clickMul: 1, sectorBoost: boost, blocked: [],
+    sectorOf: {}, clause: null, clicks: 0, lastBoomSector: null, saved: Date.now(),
+    earned: 0, flows: 0, bugs: 0, sells: 0, crises: 0, buybacks: 0, maxOwned: new Array(BIZ.length).fill(0),
+    ach: {}, muted: false, offlineGain: 0, offlineSecs: 0,
+    fs: 0, ipos: 0, runEarned: 0
+  };
+}
+const num = (v, d) => (typeof v === 'number' && isFinite(v)) ? v : d;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return { s: freshState(), found: false };
+    const d = JSON.parse(raw);
+    if (!d || typeof d !== 'object') return { s: freshState(), found: false };
+    const s = freshState();
+    s.money = Math.max(0, num(d.money, 0));
+    if (Array.isArray(d.biz)) s.biz = s.biz.map((_, i) => Math.max(0, Math.floor(num(d.biz[i], 0))));
+    if (Array.isArray(d.ups)) s.ups = s.ups.map((_, i) => !!d.ups[i]);
+    s.hype = clamp(num(d.hype, 0), 0, 100);
+    s.P = Math.max(0, Math.floor(num(d.P, 0)));
+    s.rounds = Math.max(0, Math.floor(num(d.rounds, 0)));
+    if (Array.isArray(d.dilutions)) {
+      s.dilutions = d.dilutions
+        .filter(x => x && typeof x.d === 'number' && x.d > 0 && x.d < 1)
+        .map(x => ({ d: x.d, round: String(x.round || ''), card: String(x.card || ''), V: Math.max(0, num(x.V, 0)) }));
+    }
+    s.clickMul = Math.max(1, num(d.clickMul, 1));
+    if (d.sectorBoost && typeof d.sectorBoost === 'object') SKEYS.forEach(k => { s.sectorBoost[k] = Math.max(1, num(d.sectorBoost[k], 1)); });
+    if (Array.isArray(d.blocked)) s.blocked = d.blocked.filter(k => SKEYS.indexOf(k) >= 0);
+    if (d.sectorOf && typeof d.sectorOf === 'object') {
+      Object.keys(d.sectorOf).forEach(i => { if (SKEYS.indexOf(d.sectorOf[i]) >= 0 && BIZ[i]) s.sectorOf[i] = d.sectorOf[i]; });
+    }
+    if (d.clause && typeof d.clause === 'object') {
+      s.clause = { deadline: num(d.clause.deadline, 0), target: num(d.clause.target, 0), lose: Math.max(0, Math.floor(num(d.clause.lose, 0))) };
+    }
+    s.clicks = Math.max(0, Math.floor(num(d.clicks, 0)));
+    s.lastBoomSector = SKEYS.indexOf(d.lastBoomSector) >= 0 ? d.lastBoomSector : null;
+    s.saved = num(d.saved, Date.now());
+    s.earned = Math.max(0, num(d.earned, 0));
+    s.flows = Math.max(0, Math.floor(num(d.flows, 0)));
+    s.bugs = Math.max(0, Math.floor(num(d.bugs, 0)));
+    s.sells = Math.max(0, Math.floor(num(d.sells, 0)));
+    s.crises = Math.max(0, Math.floor(num(d.crises, 0)));
+    s.buybacks = Math.max(0, Math.floor(num(d.buybacks, 0)));
+    if (Array.isArray(d.maxOwned)) s.maxOwned = s.maxOwned.map((_, i) => Math.max(0, Math.floor(num(d.maxOwned[i], 0))));
+    if (d.ach && typeof d.ach === 'object') Object.keys(d.ach).forEach(k => { if (d.ach[k] === true) s.ach[k] = true; });
+    s.muted = !!d.muted;
+    s.offlineGain = Math.max(0, num(d.offlineGain, 0));
+    s.offlineSecs = Math.max(0, num(d.offlineSecs, 0));
+    s.fs = Math.max(0, Math.floor(num(d.fs, 0)));
+    s.ipos = Math.max(0, Math.floor(num(d.ipos, 0)));
+    s.runEarned = Math.max(0, num(d.runEarned, s.earned));
+    return { s, found: true };
+  } catch (e) {
+    return { s: freshState(), found: false };
+  }
+}
+function save() {
+  try { S.saved = Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* sin almacenamiento */ }
+}
+
+const L = load();
+let S = L.s;
+const R = {
+  tab: 'code', sub: 'ev', mode: '1', flow: 0, flowUntil: 0, events: [], pending: null, c: null,
+  dilSig: null, dilEls: [], bugEnd: 0, nextBug: Date.now() + rand(25, 45) * 1000, pt: 0, upEls: [], bizEls: [], achEls: [], armed: false, modalLock: false, newAch: false
+};
+
+/* ================= Sonido (Web Audio API) ================= */
+const Snd = {
+  ctx: null, master: null, last: {},
+  init() {
+    if (this.ctx) return;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = S.muted ? 0 : 0.5;
+      this.master.connect(this.ctx.destination);
+    } catch (e) { this.ctx = null; }
+  },
+  resume() { if (this.ctx && this.ctx.state === 'suspended') { try { this.ctx.resume(); } catch (e) { /* nada */ } } },
+  tone(f, d, type, v, delay, to) {
+    const c = this.ctx; if (!c) return;
+    try {
+      const t = c.currentTime + (delay || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f, t);
+      if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(v, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(this.master);
+      o.start(t); o.stop(t + d + 0.03);
+    } catch (e) { /* nada */ }
+  },
+  noise(d, v, delay, freq) {
+    const c = this.ctx; if (!c) return;
+    try {
+      const n = Math.max(1, Math.floor(c.sampleRate * d));
+      const buf = c.createBuffer(1, n, c.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq || 2000;
+      const g = c.createGain();
+      const t = c.currentTime + (delay || 0);
+      g.gain.setValueAtTime(v, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      src.connect(f); f.connect(g); g.connect(this.master);
+      src.start(t);
+    } catch (e) { /* nada */ }
+  },
+  play(name) {
+    if (S.muted || !this.ctx) return;
+    const now = Date.now();
+    if ((name === 'click' || name === 'click2') && now - (this.last[name] || 0) < 35) return;
+    this.last[name] = now;
+    this.resume();
+    const T = (f, d, type, v, delay, to) => this.tone(f, d, type, v, delay, to);
+    switch (name) {
+      case 'click': { const f = 520 * (0.92 + Math.random() * 0.16); T(f, 0.07, 'triangle', 0.16, 0, f * 1.4); this.noise(0.02, 0.05, 0, 3000); break; }
+      case 'click2': { const f = 780 * (0.92 + Math.random() * 0.16); T(f, 0.08, 'square', 0.07, 0, f * 1.5); break; }
+      case 'buy': T(500, 0.08, 'square', 0.08, 0, 900); T(900, 0.1, 'triangle', 0.12, 0.06); break;
+      case 'up': [523, 659, 784].forEach((f, i) => T(f, 0.12, 'triangle', 0.14, i * 0.07)); break;
+      case 'flow': T(300, 0.3, 'sawtooth', 0.08, 0, 1400); break;
+      case 'bug': T(800, 0.08, 'square', 0.08, 0, 1400); T(1400, 0.1, 'triangle', 0.12, 0.07); break;
+      case 'boom': [392, 494, 587, 784].forEach((f, i) => T(f, 0.16, 'triangle', 0.15, i * 0.09)); break;
+      case 'crisis': T(300, 0.35, 'sawtooth', 0.12, 0, 110); T(220, 0.4, 'square', 0.07, 0.15, 90); break;
+      case 'pop': this.noise(0.35, 0.25, 0, 1200); T(150, 0.3, 'sine', 0.2, 0, 40); break;
+      case 'coin': T(988, 0.08, 'square', 0.08); T(1319, 0.25, 'square', 0.08, 0.08); break;
+      case 'ach': [523, 659, 784, 1047].forEach((f, i) => T(f, 0.2, 'triangle', 0.16, i * 0.1)); T(1047, 0.45, 'sine', 0.1, 0.4); break;
+      case 'round': [392, 523, 659, 784, 1047].forEach((f, i) => T(f, 0.25, 'triangle', 0.16, i * 0.12)); T(1319, 0.6, 'sine', 0.12, 0.6); break;
+      default: break;
+    }
+  }
+};
+['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+  document.addEventListener(ev, () => { Snd.init(); Snd.resume(); }, { capture: true, passive: true }));
+function applyMute() {
+  const b = $('#btnMute');
+  b.textContent = S.muted ? '🔇' : '🔊';
+  b.setAttribute('aria-pressed', S.muted ? 'true' : 'false');
+  if (Snd.master) Snd.master.gain.value = S.muted ? 0 : 0.5;
+}
+
+/* ================= Dinero ganado y logros ================= */
+function earn(x) { S.money += x; S.earned += x; S.runEarned += x; }
+const ACH = [
+  { id: 'hola',    icon: '👋', n: 'Hola, mundo',               d: 'Escribe tu primer clic',                 b: 0.01, p: () => [S.clicks, 1] },
+  { id: 'clics1k', icon: '⌨️', n: 'Mil commits',               d: '1.000 clics',                            b: 0.02, p: () => [S.clicks, 1000] },
+  { id: 'clics10k',icon: '🦾', n: 'Túnel carpiano',            d: '10.000 clics',                           b: 0.03, p: () => [S.clicks, 10000] },
+  { id: 'cliente', icon: '📱', n: 'Primer cliente',            d: 'Compra tu primer Garaje Fix',            b: 0.01, p: () => [S.maxOwned[0], 1] },
+  { id: 'franq',   icon: '🔧', n: 'Franquicia de pantallas',   d: '25 Garaje Fix a la vez',                 b: 0.02, p: () => [S.maxOwned[0], 25] },
+  { id: 'cien',    icon: '💯', n: 'Centenario',                d: '100 unidades de un mismo negocio',       b: 0.05, p: () => [Math.max.apply(null, S.maxOwned), 100] },
+  { id: 'cartera', icon: '🗂️', n: 'Cartera completa',          d: 'Posee los 8 tipos de negocio',           b: 0.05, p: () => [S.maxOwned.filter(n => n > 0).length, 8] },
+  { id: 'stack',   icon: '🛠️', n: 'Stack completo',            d: 'Compra las 8 mejoras de clic',           b: 0.03, p: () => [S.ups.filter(Boolean).length, 8] },
+  { id: 'm1M',     icon: '💵', n: 'Primer millón',             d: 'Gana $1M en total',                      b: 0.02, p: () => [S.earned, 1e6] },
+  { id: 'm1B',     icon: '💰', n: 'Mil millones',              d: 'Gana $1B en total',                      b: 0.03, p: () => [S.earned, 1e9] },
+  { id: 'm1T',     icon: '🏦', n: 'Trillonario',               d: 'Gana $1T en total',                      b: 0.05, p: () => [S.earned, 1e12] },
+  { id: 'm1Qa',    icon: '👑', n: 'Dueño del mercado',         d: 'Gana $1Qa en total',                     b: 0.08, p: () => [S.earned, 1e15] },
+  { id: 'flow',    icon: '⚡', n: 'Zona de flujo',             d: 'Activa el modo Flow 10 veces',           b: 0.02, p: () => [S.flows, 10] },
+  { id: 'bugs',    icon: '🐞', n: 'Cazabugs',                  d: 'Arregla 10 bugs críticos',               b: 0.02, p: () => [S.bugs, 10] },
+  { id: 'sell',    icon: '📉', n: 'Vende en el pico',          d: 'Vende en el pico una vez',               b: 0.02, p: () => [S.sells, 1] },
+  { id: 'crisis',  icon: '🛟', n: 'Superviviente',             d: 'Aguanta 5 crisis de mercado',            b: 0.02, p: () => [S.crises, 5] },
+  { id: 'divers',  icon: '🧺', n: 'Cartera blindada',          d: 'Alcanza 70% de diversificación',         b: 0.03, p: () => [(R.c && R.c.ips > 0) ? Math.round(R.c.dn * 100) : 0, 70] },
+  { id: 'buyback', icon: '🤝', n: 'Recupera el control',       d: 'Recompra acciones una vez',              b: 0.02, p: () => [S.buybacks, 1] },
+  { id: 'r1',      icon: '💼', n: 'Primera ronda',             d: 'Cierra tu primera ronda',                b: 0.04, p: () => [S.rounds, 1] },
+  { id: 'r3',      icon: '🏢', n: 'Serie A',                   d: 'Cierra 3 rondas de inversión',           b: 0.06, p: () => [S.rounds, 3] },
+  { id: 'r6',      icon: '🔔', n: 'Toca la campana',           d: 'Completa la OPV (6 rondas)',             b: 0.10, p: () => [S.rounds, 6] },
+  { id: 'ipo',     icon: '📈', n: 'Cotizas en bolsa',          d: 'Completa tu primera IPO',                b: 0.05, p: () => [S.ipos, 1] }
+];
+const machs = () => 1 + ACH.reduce((a, x) => a + (S.ach[x.id] ? x.b : 0), 0);
+function checkAch() {
+  for (let i = 0; i < S.maxOwned.length; i++) if (S.biz[i] > S.maxOwned[i]) S.maxOwned[i] = S.biz[i];
+  ACH.forEach(a => {
+    if (S.ach[a.id]) return;
+    const p = a.p();
+    if (p[0] >= p[1]) {
+      S.ach[a.id] = true; R.newAch = true;
+      Snd.play('ach');
+      toast('🏅 ' + a.n + ' · +' + Math.round(a.b * 100) + '% ingresos');
+    }
+  });
+}
+function buildAch() {
+  const g = $('#achGrid');
+  ACH.forEach(a => {
+    const d = document.createElement('div');
+    d.className = 'badge';
+    d.innerHTML = '<div class="b-ico">' + a.icon + '</div><div class="b-n">' + a.n + '</div><div class="b-d">' + a.d + '</div><div class="bar"><i></i></div><div class="b-p"></div>';
+    g.appendChild(d);
+    R.achEls.push({ card: d, bar: $('.bar i', d), p: $('.b-p', d) });
+  });
+  $('#achMax').textContent = '+' + Math.round(100 * ACH.reduce((a, x) => a + x.b, 0)) + '%';
+}
+function updateAch() {
+  let n = 0;
+  ACH.forEach((a, i) => {
+    const el = R.achEls[i], p = a.p(), got = !!S.ach[a.id];
+    if (got) n++;
+    el.card.classList.toggle('got', got);
+    el.bar.style.width = (100 * clamp(p[0] / p[1], 0, 1)) + '%';
+    el.p.textContent = got ? '✔ +' + Math.round(a.b * 100) + '% ingresos' : fmt(Math.min(p[0], p[1])) + ' / ' + fmt(p[1]) + ' · +' + Math.round(a.b * 100) + '%';
+  });
+  $('#achCount').textContent = n + '/' + ACH.length;
+  $('#achMult').textContent = '×' + machs().toFixed(2);
+}
+
+/* ================= Ganancias offline ================= */
+const OFFLINE_CAP = 4 * 3600;   // máximo 4 h contabilizadas
+const OFFLINE_EFF = 0.5;        // 50% de eficiencia
+function registerAbsence(dt) {
+  const gain = calc().base * Math.min(dt, OFFLINE_CAP) * OFFLINE_EFF;
+  if (!(gain > 0)) return;
+  if (dt < 30) { earn(gain); return; }   // ausencias cortas: se suma sin modal
+  S.offlineGain += gain;
+  S.offlineSecs += dt;
+}
+function showOffline() {
+  const away = S.offlineSecs;
+  openModal('<h3>👋 ¡Bienvenido de vuelta!</h3><p>Estuviste fuera <b>' + fmtDur(away) + '</b>. Tus startups siguieron trabajando' +
+    (away > OFFLINE_CAP ? ' (se cuentan como máximo 4 h)' : '') + ' al 50% de eficiencia y generaron:</p>' +
+    '<div class="bigmoney">' + mon(S.offlineGain) + '</div>' +
+    '<button class="btn gold" id="mClaim">💰 Reclamar</button>', true);
+  $('#mClaim').addEventListener('click', claimOffline);
+}
+function claimOffline() {
+  const g = S.offlineGain;
+  if (g > 0) { earn(g); toast('💰 Reclamaste ' + mon(g)); Snd.play('coin'); }
+  S.offlineGain = 0; S.offlineSecs = 0;
+  closeModal(); save();
+}
+
+/* ================= Cálculos ================= */
+const secOf = i => S.sectorOf[i] || BIZ[i].sector;
+const minv = () => 1 + 0.05 * S.P;
+const FS_BONUS = 0.10;                                   // +10% por Acción de Fundador
+const mfs = () => 1 + FS_BONUS * S.fs;
+const control = () => S.dilutions.reduce((a, x) => a * (1 - x.d), 1);
+function bizRaw(i) {
+  const n = S.biz[i];
+  if (n <= 0) return 0;
+  return BIZ[i].inc * n * Math.pow(2, Math.min(16, Math.floor(n / 25)));
+}
+function hasSector(k) { return BIZ.some((_, i) => S.biz[i] > 0 && secOf(i) === k); }
+
+function evValue(ev, now, dn) {
+  const t = clamp((now - ev.start) / ev.dur, 0, 1);
+  if (ev.kind === 'boom') return 1 + (ev.m - 1) * Math.sin(Math.PI * t);
+  return 1 - (1 - ev.m) * (1 - 0.6 * dn);
+}
+function sectorEventMult(k, now, dn) {
+  if (S.blocked.indexOf(k) >= 0) return 1;
+  let m = 1;
+  for (const ev of R.events) {
+    if (now >= ev.start + ev.dur) continue;
+    if (ev.sectors === 'all' || ev.sectors.indexOf(k) >= 0) m *= evValue(ev, now, dn);
+  }
+  return m;
+}
+function calc(now) {
+  now = now || Date.now();
+  const raw = []; let rawSum = 0; const inc = {};
+  SKEYS.forEach(k => { inc[k] = 0; });
+  for (let i = 0; i < BIZ.length; i++) {
+    const r = bizRaw(i); raw.push(r); rawSum += r;
+    inc[secOf(i)] += r * S.sectorBoost[secOf(i)];
+  }
+  let tot = 0; SKEYS.forEach(k => { tot += inc[k]; });
+  const share = {}; let hh = 0;
+  SKEYS.forEach(k => { share[k] = tot > 0 ? inc[k] / tot : 0; hh += share[k] * share[k]; });
+  const dn = tot > 0 ? clamp((1 - hh) / 0.8, 0, 1) : 0;
+  const mult = {}; SKEYS.forEach(k => { mult[k] = sectorEventMult(k, now, dn); });
+  const g = minv() * control() * machs() * mfs();
+  let ips = 0, base = 0;
+  for (let i = 0; i < BIZ.length; i++) {
+    const k = secOf(i);
+    const b = raw[i] * S.sectorBoost[k] * g;
+    base += b; ips += b * mult[k];
+  }
+  return { ips, base, rawSum, V: 1200 * rawSum, share, dn, mult, raw, g };
+}
+const flowOn = () => Date.now() < R.flowUntil;
+function clickParts() {
+  let add = 0, mul = 1, phi = 0.03;
+  UPS.forEach((u, i) => {
+    if (!S.ups[i]) return;
+    if (u.t === 'add') add += u.v; else mul *= u.v;
+    if (u.phi) phi = u.phi;
+  });
+  return { add, mul, phi };
+}
+function clickValue() {
+  const p = clickParts();
+  return (1 + p.add) * p.mul * minv() * S.clickMul * (flowOn() ? 3 : 1) * control() * machs() * mfs() + p.phi * R.c.ips;
+}
+function costK(i, k) {
+  const first = BIZ[i].base * Math.pow(COST_R, S.biz[i]);
+  return first * (Math.pow(COST_R, k) - 1) / (COST_R - 1);
+}
+function maxBuy(i, money) {
+  const first = BIZ[i].base * Math.pow(COST_R, S.biz[i]);
+  if (!(money >= first)) return 0;
+  let k = Math.floor(Math.log(1 + money * (COST_R - 1) / first) / Math.log(COST_R));
+  if (!isFinite(k) || k < 0) k = 0;
+  let g = 0;
+  while (k > 0 && costK(i, k) > money && g++ < 5) k--;
+  g = 0;
+  while (costK(i, k + 1) <= money && g++ < 5) k++;
+  return k;
+}
+const isUnlocked = i => i === 0 || S.rounds > 0 || S.biz[i - 1] > 0 || S.biz[i] > 0;
+const bizIncome = i => R.c.raw[i] * S.sectorBoost[secOf(i)] * R.c.g * R.c.mult[secOf(i)];
+const sectorsText = s => s === 'all' ? 'Todos los sectores' : (!s ? 'Sector del último boom' : s.map(k => SECTORS[k].n).join(' + '));
+
+/* ================= DOM ================= */
+const moneyEl = $('#money'), ipsEl = $('#ips'), valEl = $('#val'), invEl = $('#inv'), chipsEl = $('#chips');
+const codeBtn = $('#codeBtn'), clickZone = $('#clickZone'), floatsEl = $('#floats'), bugEl = $('#bug');
+const toastsEl = $('#toasts'), modalEl = $('#modal'), modalBody = $('#modalBody');
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  toastsEl.appendChild(t);
+  while (toastsEl.children.length > 3) toastsEl.firstChild.remove();
+  setTimeout(() => t.classList.add('out'), 3200);
+  setTimeout(() => t.remove(), 3700);
+}
+function openModal(html, lock) { R.modalLock = !!lock; modalBody.innerHTML = html; modalEl.hidden = false; modalBody.scrollTop = 0; }
+function closeModal() { R.modalLock = false; modalEl.hidden = true; modalBody.innerHTML = ''; }
+modalEl.addEventListener('click', e => { if (e.target === modalEl && !R.modalLock) closeModal(); });
+
+function spawnFloat(x, y, text, big) {
+  const r = clickZone.getBoundingClientRect();
+  const el = document.createElement('span');
+  el.className = 'float' + (big ? ' big' : '');
+  el.textContent = text;
+  el.style.left = clamp(x - r.left + rand(-22, 22), 20, r.width - 20) + 'px';
+  el.style.top = (y - r.top) + 'px';
+  floatsEl.appendChild(el);
+  while (floatsEl.childElementCount > 24) floatsEl.removeChild(floatsEl.firstChild);
+  setTimeout(() => el.remove(), 950);
+}
+
+/* ================= Acciones ================= */
+function doClick(x, y) {
+  const v = clickValue();
+  earn(v); S.clicks++;
+  Snd.play(flowOn() ? 'click2' : 'click');
+  const boom = R.events.some(e => e.kind === 'boom');
+  S.hype = Math.min(100, S.hype + (boom ? 0.7 : 0.35));
+  if (!flowOn()) {
+    R.flow += 4;
+    if (R.flow >= 100) { R.flow = 0; R.flowUntil = Date.now() + 6000; S.flows++; Snd.play('flow'); toast('⚡ ¡Modo Flow! Clic ×3 durante 6 s'); }
+  }
+  spawnFloat(x, y, '+$' + fmt(v), false);
+  codeBtn.classList.add('press');
+  clearTimeout(R.pt);
+  R.pt = setTimeout(() => codeBtn.classList.remove('press'), 70);
+}
+codeBtn.addEventListener('pointerdown', e => { e.preventDefault(); doClick(e.clientX, e.clientY); }, { passive: false });
+codeBtn.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
+    e.preventDefault();
+    const r = codeBtn.getBoundingClientRect();
+    doClick(r.left + r.width / 2, r.top + r.height / 2);
+  }
+});
+codeBtn.addEventListener('contextmenu', e => e.preventDefault());
+
+bugEl.addEventListener('pointerdown', e => {
+  e.preventDefault(); e.stopPropagation();
+  const reward = Math.max(60 * R.c.ips, 30 * clickValue());
+  earn(reward); S.bugs++; Snd.play('bug');
+  spawnFloat(e.clientX, e.clientY, '+$' + fmt(reward), true);
+  toast('🐞 ¡Bug crítico arreglado! +' + mon(reward));
+  bugEl.hidden = true; R.bugEnd = 0;
+}, { passive: false });
+
+function buyUp(j) {
+  const u = UPS[j];
+  if (S.ups[j] || S.money < u.cost) return;
+  S.money -= u.cost; S.ups[j] = true;
+  toast('⌨️ ' + u.n); Snd.play('up');
+  R.c = calc(); updateUI();
+}
+function buyBiz(i) {
+  if (!isUnlocked(i)) return;
+  let k;
+  if (R.mode === 'max') { k = maxBuy(i, S.money); if (k < 1) return; }
+  else { k = Number(R.mode); if (costK(i, k) > S.money) return; }
+  const before = S.biz[i];
+  S.money -= costK(i, k);
+  S.biz[i] += k; Snd.play('buy');
+  if (Math.floor(S.biz[i] / 25) > Math.floor(before / 25) && before < 400) toast('✨ Hito en ' + BIZ[i].name + ': ingresos ×2');
+  R.c = calc(); updateUI();
+}
+
+/* ---- Eventos ---- */
+function weightedPick(pool, weights) {
+  const tot = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * tot;
+  for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r <= 0) return pool[i]; }
+  return pool[pool.length - 1];
+}
+function pickEvent(exclude) {
+  const boom = Math.random() < clamp(0.7 - 0.3 * S.hype / 100, 0.3, 0.7);
+  const pool = (boom ? BOOMS : CRISES).filter(e => !exclude || e.key !== exclude.key);
+  const w = pool.map(e => (!e.sectors || e.sectors === 'all') ? 2 : (e.sectors.some(hasSector) ? 3 : 1));
+  return weightedPick(pool, w);
+}
+function scheduleNext(delayMs) {
+  const d = delayMs != null ? delayMs : clamp(-Math.log(1 - Math.random()) * 300, 45, 600) * 1000;
+  const def = pickEvent();
+  const truth = Math.random() < 0.7;
+  R.pending = { def, fireAt: Date.now() + d, rumorDef: truth ? def : pickEvent(def), rumorShown: false, forced: false };
+}
+function fireEvent(def, sectorsOverride) {
+  const now = Date.now();
+  let sectors = sectorsOverride || def.sectors;
+  if (!sectors) sectors = [S.lastBoomSector || SKEYS[Math.floor(Math.random() * SKEYS.length)]];
+  let dur = def.dur * 1000, runway = false;
+  if (def.kind === 'crisis') {
+    const c = R.c || calc(now);
+    if (c.ips > 0 && S.money >= 300 * c.ips) { dur /= 2; runway = true; }
+  }
+  R.events = R.events.filter(e => e.key !== def.key);
+  R.events.push({ key: def.key, kind: def.kind, icon: def.icon, name: def.name, sectors, m: def.m, dur, start: now, runway });
+  if (def.kind === 'boom') S.lastBoomSector = sectors[0];
+  if (def.kind === 'crisis') S.crises++;
+  Snd.play(def.kind === 'boom' ? 'boom' : 'crisis');
+  toast(def.icon + ' ' + def.name + ': ' + sectorsText(sectors) + (runway ? ' · Runway: dura la mitad' : ''));
+}
+function popBubble() {
+  const booms = R.events.filter(e => e.kind === 'boom');
+  if (!booms.length) return;
+  const secs = [];
+  booms.forEach(b => b.sectors.forEach(k => { if (secs.indexOf(k) < 0) secs.push(k); }));
+  R.events = R.events.filter(e => e.kind !== 'boom');
+  S.hype = Math.min(S.hype, 10);
+  fireEvent(CRISES[0], secs);
+  Snd.play('pop');
+  toast('💥 ¡La burbuja ha estallado!');
+}
+function sellPeak() {
+  if (!R.events.some(e => e.kind === 'boom')) return;
+  const gain = S.hype * 2 * R.c.ips;
+  earn(gain); S.sells++; Snd.play('coin');
+  R.events = R.events.filter(e => e.kind !== 'boom');
+  S.hype = 0;
+  toast('💰 Vendiste en el pico: +' + mon(gain));
+  R.c = calc(); updateUI();
+}
+$('#btnSell').addEventListener('click', sellPeak);
+
+/* ---- Pivote ---- */
+const pvB = $('#pvBiz'), pvS = $('#pvSec');
+BIZ.forEach((b, i) => pvB.add(new Option(b.icon + ' ' + b.name, String(i))));
+SKEYS.forEach(k => pvS.add(new Option(SECTORS[k].i + ' ' + SECTORS[k].n, k)));
+$('#pvBtn').addEventListener('click', () => {
+  const i = Number(pvB.value), k = pvS.value;
+  if (S.biz[i] <= 0) { toast('Aún no tienes ese negocio'); return; }
+  if (secOf(i) === k) { toast('Ya opera en ese sector'); return; }
+  if (S.hype < 30) { toast('Necesitas 30 de Hype para pivotar'); return; }
+  S.hype -= 30; S.sectorOf[i] = k;
+  toast('🔀 ' + BIZ[i].name + ' pivota a ' + SECTORS[k].n); Snd.play('up');
+  R.c = calc(); updateUI(); save();
+});
+
+/* ---- Rondas ---- */
+function makeOffers() {
+  const free = SKEYS.filter(k => S.blocked.indexOf(k) < 0);
+  const pool = free.length ? free : SKEYS;
+  const sector = pool[Math.floor(Math.random() * pool.length)];
+  return [
+    { id: 'aggr', icon: '🦈', name: 'Fondo Agresivo', pMul: 1.5, d: 0.20,
+      text: 'Puntos ×1,5 · Dilución 20%', clause: 'Cláusula: recupera tu valoración en 20 min o pierdes el 25% de los puntos ganados.' },
+    { id: 'angel', icon: '😇', name: 'Business Angel', pMul: 1, d: 0.05,
+      text: 'Puntos ×1,0 · Clic ×2 permanente · Dilución 5%', clause: 'Sin cláusulas.' },
+    { id: 'corp', icon: '🏛️', name: 'Corporación Aliada', pMul: 1, d: 0.12, sector,
+      text: 'Sector ' + SECTORS[sector].n + ' ×4 permanente · Dilución 12%',
+      clause: 'Ese sector queda blindado: los eventos de mercado ya no lo afectan (ni para bien ni para mal).' }
+  ];
+}
+function openRound() {
+  const c = R.c, k = S.rounds + 1, Vk = roundThreshold(k);
+  if (c.V < Vk) return;
+  const base = Math.floor(10 * Math.sqrt(c.V / Vk));
+  const offers = makeOffers();
+  let html = '<h3>💼 ' + esc(roundName(k)) + '</h3><p class="small">Valoración ' + mon(c.V) +
+    '. Elige inversor. Reiniciarás dinero y startups; conservas tus mejoras de código.</p>';
+  offers.forEach((o, idx) => {
+    const g = Math.floor(base * o.pMul);
+    html += '<div class="card"><div class="of-h"><b>' + o.icon + ' ' + o.name + '</b><span class="tag">−' + Math.round(o.d * 100) + '% control</span></div>' +
+      '<div class="of-b">' + o.text + '</div><div class="small warn">' + o.clause + '</div>' +
+      '<div class="of-p">Ganas ' + g + ' pts → inversores ×' + (1 + 0.05 * (S.P + g)).toFixed(2) + '</div>' +
+      '<button class="btn mag" data-o="' + idx + '">Aceptar oferta</button></div>';
+  });
+  html += '<button class="btn" id="mCancel">Ahora no</button>';
+  openModal(html);
+  $$('[data-o]', modalBody).forEach(b => b.addEventListener('click', () => acceptRound(offers[Number(b.dataset.o)], base, c.V, k)));
+  $('#mCancel').addEventListener('click', closeModal);
+}
+function acceptRound(o, base, V, k) {
+  const gained = Math.floor(base * o.pMul);
+  S.P += gained; S.rounds++;
+  S.dilutions.push({ d: o.d, round: roundName(k), card: o.name, V });
+  if (o.id === 'aggr') S.clause = { deadline: Date.now() + 20 * 60000, target: V, lose: Math.floor(gained * 0.25) };
+  if (o.id === 'angel') S.clickMul *= 2;
+  if (o.id === 'corp') { S.sectorBoost[o.sector] *= 4; if (S.blocked.indexOf(o.sector) < 0) S.blocked.push(o.sector); }
+  S.money = 0; S.biz = S.biz.map(() => 0); S.sectorOf = {}; S.hype = 0;
+  R.events = []; R.flow = 0; R.flowUntil = 0; R.dilSig = null;
+  if (control() < 0.5) {
+    const def = CRISES[Math.floor(Math.random() * CRISES.length)];
+    R.pending = { def, fireAt: Date.now() + 60000, rumorDef: def, rumorShown: true, forced: true };
+    toast('🏛️ Control < 50%: la Junta fuerza una crisis en 60 s');
+  } else scheduleNext(90000);
+  closeModal();
+  R.c = calc(); updateUI(); save();
+  Snd.play('round');
+  toast('🎉 ' + roundName(k) + ' cerrada: +' + gained + ' pts de inversión');
+}
+$('#rdBtn').addEventListener('click', openRound);
+const recCost = x => 0.1 * x.d * Math.max(R.c.V, x.V);
+function recompra(idx) {
+  const x = S.dilutions[idx];
+  if (!x) return;
+  const cost = recCost(x);
+  if (S.money < cost) return;
+  S.money -= cost;
+  S.dilutions.splice(idx, 1);
+  R.dilSig = null;
+  S.buybacks++; Snd.play('buy');
+  toast('🤝 Recompraste acciones de ' + x.card);
+  R.c = calc(); updateUI(); save();
+}
+function dilSignature() { return S.dilutions.map(x => x.round + '|' + x.card + '|' + x.d).join(';'); }
+function buildDil() {
+  const box = $('#dilBox');
+  R.dilSig = dilSignature(); R.dilEls = [];
+  if (!S.dilutions.length) { box.innerHTML = '<div class="small muted">Sin dilución: controlas el 100% de tu empresa.</div>'; return; }
+  box.innerHTML = '';
+  S.dilutions.forEach((x, idx) => {
+    const d = document.createElement('div');
+    d.className = 'card dil';
+    d.innerHTML = '<div><b>' + esc(x.round) + '</b> · ' + esc(x.card) + '<div class="small">−' + Math.round(x.d * 100) + '% de control</div></div><button class="btn"></button>';
+    const b = $('button', d);
+    b.addEventListener('click', () => recompra(idx));
+    box.appendChild(d); R.dilEls.push(b);
+  });
+}
+
+
+/* ================= Prestigio: Salida a Bolsa (IPO) ================= */
+const IPO_ROUNDS = 6;
+const ipoReady = () => S.rounds >= IPO_ROUNDS;
+const ipoGain = () => ipoReady() ? Math.max(1, Math.floor(3 * Math.sqrt(S.runEarned / 1e13))) : 0;
+function openIpo() {
+  if (!ipoReady()) return;
+  const g = ipoGain();
+  openModal('<h3>🔔 Salida a Bolsa (IPO)</h3>' +
+    '<p>Tu empresa sale a cotizar. Ganas <b>+' + g + ' Acciones de Fundador</b>: clics e ingresos ×' + (1 + FS_BONUS * (S.fs + g)).toFixed(2) + ' <b>para siempre</b>.</p>' +
+    '<p class="small">Reinicias dinero, startups, mejoras de clic, rondas, inversores y diluciones. Conservas logros y Acciones de Fundador.</p>' +
+    '<button class="btn gold" id="ipoGo">🔔 Tocar la campana</button><button class="btn" id="mCancel">Ahora no</button>');
+  $('#ipoGo').addEventListener('click', doIPO);
+  $('#mCancel').addEventListener('click', closeModal);
+}
+function doIPO() {
+  if (!ipoReady()) return;
+  const gain = ipoGain(), fresh = freshState();
+  S.fs += gain; S.ipos++;
+  ['money', 'biz', 'ups', 'hype', 'P', 'rounds', 'dilutions', 'clickMul', 'sectorBoost', 'blocked', 'sectorOf', 'clause', 'runEarned', 'lastBoomSector']
+    .forEach(k => { S[k] = fresh[k]; });
+  R.events = []; R.flow = 0; R.flowUntil = 0; R.dilSig = null;
+  scheduleNext(90000);
+  closeModal();
+  R.c = calc(); checkAch(); updateUI(); save();
+  Snd.play('round');
+  toast('🔔 ¡IPO completada! +' + gain + ' Acciones de Fundador');
+}
+function updateIpo() {
+  const ready = ipoReady(), g = ipoGain(), r = Math.min(S.rounds, IPO_ROUNDS);
+  $('#fsN').textContent = S.fs;
+  $('#fsM').textContent = '×' + mfs().toFixed(2);
+  $('#fsI').textContent = S.ipos;
+  $('#ipoReq').textContent = r + ' / ' + IPO_ROUNDS + ' rondas';
+  $('#ipoBar').style.width = (100 * r / IPO_ROUNDS) + '%';
+  $('#ipoPrev').textContent = ready
+    ? 'Si sales ahora: +' + g + ' acciones → bonus ×' + (1 + FS_BONUS * (S.fs + g)).toFixed(2)
+    : 'Cierra las ' + IPO_ROUNDS + ' rondas (hasta la OPV) para desbloquear la IPO.';
+  const b = $('#ipoBtn');
+  b.disabled = !ready;
+  b.textContent = ready ? '🔔 Salir a bolsa · +' + g + ' acciones' : '🔒 IPO bloqueada';
+}
+$('#ipoBtn').addEventListener('click', openIpo);
+
+
+/* ================= Construcción de listas ================= */
+function buildUps() {
+  const box = $('#clickUps');
+  UPS.forEach((u, j) => {
+    const d = document.createElement('div');
+    d.className = 'card up';
+    d.innerHTML = '<div><div class="up-n">' + u.n + '</div><div class="up-d">' + u.d + '</div></div><button class="btn"></button>';
+    const b = $('button', d);
+    b.addEventListener('click', () => buyUp(j));
+    box.appendChild(d);
+    R.upEls.push({ card: d, btn: b });
+  });
+}
+function buildBiz() {
+  const box = $('#bizList');
+  BIZ.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.innerHTML =
+      '<div class="biz-top"><span class="bz-ico">' + ICONS[i] + '</span>' +
+      '<div class="bz-meta"><div class="bz-name"><span class="nm"></span><span class="tag sc"></span></div><div class="bz-desc"></div></div>' +
+      '<div class="bz-n">0</div></div>' +
+      '<div class="bz-mid"><div class="bar"><i></i></div><div class="small hit"></div></div>' +
+      '<div class="bz-foot"><span class="bz-inc"></span><button class="btn buy"><span class="k"></span><span class="c"></span></button></div>';
+    const btn = $('.buy', d);
+    btn.addEventListener('click', () => buyBiz(i));
+    box.appendChild(d);
+    R.bizEls.push({ card: d, ico: $('.bz-ico', d), nm: $('.nm', d), sc: $('.sc', d), desc: $('.bz-desc', d), n: $('.bz-n', d), bar: $('.bar i', d),
+      hit: $('.hit', d), inc: $('.bz-inc', d), btn, k: $('.k', d), c: $('.c', d) });
+  });
+}
+
+/* ================= Actualización de interfaz ================= */
+function updateChips(now) {
+  const c = R.c;
+  let html = '';
+  if (!R.events.length) { chipsEl.innerHTML = html + '<span class="chip idle">Mercado tranquilo</span>'; return; }
+  R.events.slice(0, 3).forEach(e => {
+    const v = evValue(e, now, c.dn);
+    html += '<span class="chip ' + e.kind + '">' + e.icon + ' ' + esc(e.name) + ' ×' + v.toFixed(2) + ' · ' + mmss((e.start + e.dur - now) / 1000) + '</span>';
+  });
+  if (R.events.length > 3) html += '<span class="chip idle">+' + (R.events.length - 3) + '</span>';
+  chipsEl.innerHTML = html;
+}
+function updateCode(now) {
+  $('#clickVal').textContent = '+' + mon(clickValue());
+  const bar = $('#flowBar'), txt = $('#flowTxt');
+  if (flowOn()) {
+    bar.classList.add('on');
+    bar.style.width = (100 * (R.flowUntil - now) / 6000) + '%';
+    txt.textContent = '⚡ FLOW ×3 · ' + ((R.flowUntil - now) / 1000).toFixed(1) + 's';
+  } else {
+    bar.classList.remove('on');
+    bar.style.width = R.flow + '%';
+    txt.textContent = 'FLOW ' + Math.floor(R.flow) + '%';
+  }
+  UPS.forEach((u, j) => {
+    const el = R.upEls[j];
+    if (S.ups[j]) { el.btn.textContent = '✔ Comprada'; el.btn.disabled = true; el.card.classList.add('owned'); el.card.classList.remove('can'); }
+    else { el.btn.textContent = mon(u.cost); el.btn.disabled = S.money < u.cost; el.card.classList.toggle('can', S.money >= u.cost); }
+  });
+}
+function updateBiz() {
+  BIZ.forEach((b, i) => {
+    const el = R.bizEls[i], n = S.biz[i], un = isUnlocked(i);
+    el.card.classList.toggle('lock', !un);
+    if (!un) {
+      el.nm.textContent = '???'; el.sc.textContent = '';
+      el.desc.textContent = 'Compra 1× ' + BIZ[i - 1].name + ' para desbloquear';
+      el.n.textContent = '🔒'; el.bar.style.width = '0%'; el.hit.textContent = '';
+      el.inc.textContent = '—'; el.k.textContent = ''; el.c.textContent = '🔒'; el.btn.disabled = true;
+      el.ico.style.color = 'var(--mut)'; el.ico.classList.remove('live');
+      el.card.classList.remove('can');
+      return;
+    }
+    const k = secOf(i), s = SECTORS[k];
+    el.nm.textContent = b.name;
+    el.sc.textContent = s.i + ' ' + s.n; el.sc.style.color = s.c; el.sc.style.borderColor = s.c;
+    el.ico.style.color = s.c; el.ico.classList.toggle('live', n > 0);
+    el.desc.textContent = b.desc;
+    el.n.textContent = '×' + n;
+    if (n >= 400) { el.bar.style.width = '100%'; el.hit.textContent = 'Hitos al máximo (×65.536)'; }
+    else { el.bar.style.width = ((n % 25) / 25 * 100) + '%'; el.hit.textContent = 'Próximo hito ×2 en ' + (25 - n % 25) + ' unidades'; }
+    if (n === 0) el.inc.textContent = 'Cada unidad: +' + mon(b.inc * R.c.g * S.sectorBoost[k] * R.c.mult[k]) + '/s';
+    else el.inc.textContent = '+' + mon(bizIncome(i)) + '/s';
+    let q, cost, can;
+    if (R.mode === 'max') { const mb = maxBuy(i, S.money); q = Math.max(1, mb); cost = costK(i, q); can = mb >= 1; el.k.textContent = 'Máx ×' + q; }
+    else { q = Number(R.mode); cost = costK(i, q); can = S.money >= cost; el.k.textContent = 'Comprar ×' + q; }
+    el.c.textContent = mon(cost);
+    el.btn.disabled = !can;
+    el.card.classList.toggle('can', can);
+  });
+}
+function updateEventsPanel(now) {
+  const c = R.c;
+  $('#hypeVal').textContent = Math.floor(S.hype) + ' / 100';
+  $('#hypeBar').style.width = S.hype + '%';
+  const boom = R.events.some(e => e.kind === 'boom');
+  const sell = $('#btnSell');
+  sell.disabled = !boom;
+  sell.textContent = boom ? '💰 Vender en el pico (+' + mon(S.hype * 2 * c.ips) + ')' : '💰 Vender en el pico (necesita un boom activo)';
+
+  const p = R.pending;
+  let radar;
+  if (p && p.forced) radar = '🏛️ La Junta convoca una crisis en ' + mmss((p.fireAt - now) / 1000) + '.';
+  else if (p && p.rumorShown) radar = '📡 Rumor (fiabilidad 70%): ' + p.rumorDef.icon + ' ' + p.rumorDef.name + ' · ' + sectorsText(p.rumorDef.sectors) + ' · en ~' + Math.max(0, Math.ceil((p.fireAt - now) / 1000)) + ' s.';
+  else radar = '📡 Radar de mercado escaneando… Los rumores llegan 30 s antes de cada evento.';
+  $('#radar').textContent = radar;
+
+  const evList = $('#evList');
+  if (!R.events.length) evList.innerHTML = '<div class="small muted" style="margin:0 2px 8px">Sin eventos activos ahora mismo.</div>';
+  else evList.innerHTML = R.events.map(e => {
+    const rem = Math.max(0, e.start + e.dur - now);
+    return '<div class="card ev ' + e.kind + '"><div class="row2"><b>' + e.icon + ' ' + esc(e.name) + '</b><span class="tag ' + e.kind + '">' + (e.kind === 'boom' ? 'BOOM' : 'CRISIS') + '</span></div>' +
+      '<div class="small">' + sectorsText(e.sectors) + ' · ×' + evValue(e, now, c.dn).toFixed(2) + (e.runway ? ' · 🛟 runway' : '') + ' · ' + mmss(rem / 1000) + '</div>' +
+      '<div class="bar" style="margin-top:6px"><i style="width:' + (100 * rem / e.dur) + '%"></i></div></div>';
+  }).join('');
+
+  $('#secTable').innerHTML = SKEYS.map(k => {
+    const s = SECTORS[k], m = c.mult[k];
+    const cls = m > 1.001 ? 'up' : (m < 0.999 ? 'down' : '');
+    return '<div class="srow"><span style="color:' + s.c + '">' + s.i + ' ' + s.n + '</span><span class="sh">' + Math.round(c.share[k] * 100) + '%</span><span class="sm ' + cls + '">×' + m.toFixed(2) + '</span>' +
+      (S.sectorBoost[k] > 1 ? '<span class="tag">×' + S.sectorBoost[k] + ' aliado</span>' : '') +
+      (S.blocked.indexOf(k) >= 0 ? '<span class="tag">🔒 blindado</span>' : '') + '</div>';
+  }).join('');
+  $('#divInfo').textContent = 'Diversificación: ' + Math.round(c.dn * 100) + '% → las crisis te pegan un ' + Math.round(60 * c.dn) + '% menos.';
+  const run = c.ips > 0 && S.money >= 300 * c.ips;
+  $('#runInfo').textContent = run ? '🛟 Runway activo: tu caja cubre 5 min, las crisis durarán la mitad.' : 'Runway: guarda caja ≥ 5 min de ingresos para que las crisis duren la mitad.';
+  const i = Number(pvB.value);
+  $('#pvInfo').textContent = BIZ[i].name + ' opera ahora en ' + SECTORS[secOf(i)].n + '.';
+}
+function updateRoundsPanel(now) {
+  const c = R.c, k = S.rounds + 1, Vk = roundThreshold(k), can = c.V >= Vk;
+  $('#rdTitle').textContent = roundName(k);
+  $('#rdReq').textContent = mon(c.V) + ' / ' + mon(Vk);
+  $('#rdBar').style.width = (100 * clamp(c.V / Vk, 0, 1)) + '%';
+  const btn = $('#rdBtn');
+  btn.disabled = !can;
+  btn.textContent = can ? 'Abrir ronda · ≈ ' + Math.floor(10 * Math.sqrt(c.V / Vk)) + ' pts' : 'Valoración insuficiente';
+  $('#stP').textContent = S.P;
+  $('#stM').textContent = '×' + minv().toFixed(2);
+  $('#stC').textContent = Math.round(control() * 100) + '%';
+  if (dilSignature() !== R.dilSig) buildDil();
+  R.dilEls.forEach((b, idx) => {
+    const x = S.dilutions[idx];
+    if (!x) return;
+    const cost = recCost(x);
+    b.textContent = 'Recomprar ' + mon(cost);
+    b.disabled = S.money < cost;
+  });
+  const cb = $('#clauseBox');
+  if (S.clause) cb.innerHTML = '<div class="card warnbox">⏳ Cláusula del Fondo Agresivo: recupera ' + mon(S.clause.target) + ' de valoración en ' + mmss((S.clause.deadline - now) / 1000) + ' o pierdes ' + S.clause.lose + ' pts.</div>';
+  else cb.innerHTML = '';
+}
+function updateUI() {
+  const now = Date.now(), c = R.c;
+  moneyEl.textContent = mon(S.money);
+  ipsEl.textContent = mon(c.ips);
+  valEl.textContent = 'Valoración ' + mon(c.V);
+  invEl.textContent = 'Inversores ×' + minv().toFixed(2);
+  $('#achH').textContent = 'Logros ×' + machs().toFixed(2);
+  $('#fsH').textContent = 'Fundador ×' + mfs().toFixed(2);
+  $('#dotIpo').hidden = !ipoReady();
+  $('#dotAch').hidden = !R.newAch;
+  updateChips(now);
+  $('#dotMkt').hidden = !(c.V >= roundThreshold(S.rounds + 1));
+  if (R.tab === 'code') updateCode(now);
+  else if (R.tab === 'biz') updateBiz();
+  else if (R.tab === 'ach') updateAch();
+  else if (R.tab === 'ipo') updateIpo();
+  else if (R.sub === 'ev') updateEventsPanel(now);
+  else updateRoundsPanel(now);
+}
+
+/* ================= Bucle de juego ================= */
+function step(dt, now) {
+  R.c = calc(now);
+  earn(R.c.ips * dt);
+  checkAch();
+  if (!flowOn()) R.flow = Math.max(0, R.flow - 10 * dt);
+  R.events = R.events.filter(e => now < e.start + e.dur);
+
+  const boom = R.events.some(e => e.kind === 'boom');
+  if (boom) {
+    S.hype = Math.min(100, S.hype + 1.2 * dt);
+    if (Math.random() < 0.004 * Math.pow(S.hype / 100, 2) * dt) popBubble();
+  } else S.hype = Math.max(0, S.hype - 0.5 * dt);
+
+  if (R.pending) {
+    const p = R.pending;
+    if (!p.rumorShown && now >= p.fireAt - 30000) {
+      p.rumorShown = true;
+      toast('📡 Rumor: ' + p.rumorDef.icon + ' ' + p.rumorDef.name + '…');
+    }
+    if (now >= p.fireAt) {
+      R.pending = null;
+      if (!p.forced && p.rumorDef !== p.def) toast('📡 El rumor era falso…');
+      fireEvent(p.def);
+      scheduleNext();
+    }
+  } else scheduleNext();
+
+  if (!bugEl.hidden) { if (now > R.bugEnd) bugEl.hidden = true; }
+  else if (now > R.nextBug && R.tab === 'code') {
+    bugEl.style.left = rand(8, 80) + '%';
+    bugEl.style.top = rand(8, 80) + '%';
+    bugEl.hidden = false;
+    R.bugEnd = now + 5000;
+    R.nextBug = now + rand(45, 90) * 1000 + 5000;
+  }
+
+  if (S.clause) {
+    if (R.c.V >= S.clause.target) { toast('✅ Cláusula cumplida'); S.clause = null; }
+    else if (now >= S.clause.deadline) {
+      const lose = Math.min(S.P, S.clause.lose);
+      S.P -= lose; S.clause = null;
+      toast('⚠️ Cláusula incumplida: −' + lose + ' pts de inversión');
+    }
+  }
+}
+let last = Date.now();
+function tick() {
+  const now = Date.now();
+  const dt = (now - last) / 1000;
+  last = now;
+  if (dt <= 0) return;
+  if (dt > 5) { registerAbsence(dt); R.c = calc(now); scheduleNext(60000); }
+  else step(dt, now);
+  if (S.offlineGain > 0 && modalEl.hidden) showOffline();
+  updateUI();
+}
+
+/* ================= Navegación y ajustes ================= */
+function showTab(t) {
+  R.tab = t;
+  if (t === 'ach') R.newAch = false;
+  $$('.tab').forEach(s => s.classList.toggle('on', s.id === 'tab-' + t));
+  $$('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  $('#main').scrollTop = 0;
+  updateUI();
+}
+$$('nav button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+$$('#subSeg button').forEach(b => b.addEventListener('click', () => {
+  R.sub = b.dataset.s;
+  $$('#subSeg button').forEach(x => x.classList.toggle('on', x === b));
+  $('#sub-ev').hidden = R.sub !== 'ev';
+  $('#sub-rd').hidden = R.sub !== 'rd';
+  updateUI();
+}));
+$$('#buyMode button').forEach(b => b.addEventListener('click', () => {
+  R.mode = b.dataset.m;
+  $$('#buyMode button').forEach(x => x.classList.toggle('on', x === b));
+  updateUI();
+}));
+$('#btnMute').addEventListener('click', () => {
+  S.muted = !S.muted;
+  Snd.init(); Snd.resume();
+  applyMute();
+  if (!S.muted) Snd.play('buy');
+  save();
+});
+$('#btnCfg').addEventListener('click', () => {
+  R.armed = false;
+  openModal('<h3>⚙️ Ajustes</h3>' +
+    '<button class="btn" id="sSave">💾 Guardar ahora</button>' +
+    '<button class="btn mag" id="sLab">🧪 Laboratorio: lanzar evento aleatorio</button>' +
+    '<button class="btn red" id="sReset">🗑️ Borrar partida</button>' +
+    '<button class="btn" id="sClose">Cerrar</button>' +
+    '<p class="small" style="margin-top:10px">Guardado automático cada 5 s en este dispositivo.</p>');
+  $('#sSave').addEventListener('click', () => { save(); toast('💾 Partida guardada'); });
+  $('#sLab').addEventListener('click', () => { fireEvent(pickEvent()); closeModal(); updateUI(); });
+  $('#sClose').addEventListener('click', closeModal);
+  $('#sReset').addEventListener('click', e => {
+    if (!R.armed) { R.armed = true; e.target.textContent = '¿Seguro? Pulsa de nuevo para borrar todo'; return; }
+    S = freshState();
+    try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* nada */ }
+    location.reload();
+  });
+});
+
+/* ================= Anti-zoom y anti-selección ================= */
+['gesturestart', 'gesturechange', 'gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].indexOf(e.key) >= 0) e.preventDefault(); });
+['selectstart', 'dragstart', 'contextmenu', 'dblclick'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
+
+/* ================= Arranque ================= */
+buildUps();
+buildBiz();
+buildAch();
+applyMute();
+R.c = calc();
+scheduleNext(90000);
+if (L.found) {
+  const away = (Date.now() - S.saved) / 1000;
+  if (away > 5) registerAbsence(away);
+}
+updateUI();
+setInterval(tick, 100);
+setInterval(save, 5000);
+window.addEventListener('pagehide', save);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { save(); if (Snd.ctx) { try { Snd.ctx.suspend(); } catch (e) { /* nada */ } } }
+  else Snd.resume();
+});
+})();
+</script>
+</body>
+</html>

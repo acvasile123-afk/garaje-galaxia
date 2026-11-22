@@ -1,0 +1,21 @@
+{
+  "name": "garaje-galaxia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Del Garaje a la Galaxia - clicker/tycoon tecnologico para Android",
+  "scripts": {
+    "add:android": "cap add android",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/core": "^8.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.0"
+  }
+}
